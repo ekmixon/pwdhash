@@ -141,11 +141,7 @@ def apply_constraints(phash, size, nonalphanumeric):
         (re.compile('[A-Z]'), lambda: next_between('A', 'Z')),
         (re.compile('[a-z]'), lambda: next_between('a', 'z')),
         (re.compile('[0-9]'), lambda: next_between('0', '9'))):
-        if len(elt.findall(result)) != 0:
-            result += next(extra_chars)
-        else:
-            result += repl()
-
+        result += next(extra_chars) if len(elt.findall(result)) != 0 else repl()
     if len(nonword.findall(result)) != 0 and nonalphanumeric:
         result += next(extra_chars)
     else:
@@ -155,19 +151,15 @@ def apply_constraints(phash, size, nonalphanumeric):
         result = nonword.sub(next_between('A', 'Z'), result, 1)
 
     amount = next(extras) % len(result)
-    result = result[amount:] + result[0:amount]
+    result = result[amount:] + result[:amount]
 
     return result
 
 
 def console_main():
     import getpass, sys, os
-    if len(sys.argv) > 1:
-        domain = sys.argv[1]
-    else:
-        domain = input("domain: ").strip()
-
-    password = getpass.getpass("Password for %s: " % domain)
+    domain = sys.argv[1] if len(sys.argv) > 1 else input("domain: ").strip()
+    password = getpass.getpass(f"Password for {domain}: ")
     generated = generate(password, domain)
 
     copied_to_clipboard = False
